@@ -9,36 +9,6 @@ const upload = require('./multer')
 
 
 
-
-
-
-
-const cors = require('cors')
-
-app.use(cors(
-  {
-    origin:[https://deploy-mern-1whq.vercel.app"],
-            methods : ["POST" , "GET"],
-            credentials :true
-            }
-  ));
-app.use(express.json())
-
-
-
-
-
-
-
-
-
-
-mongoose.connect(mongodb+srv://abhigyan:test123@mongoyoutube.zvi76a0.mongodb.net/test?retryWrites=true&w=majority&appName=MongoYoutube)
-
-
-
-
-
 passport.use(new localStrategy(userModel.authenticate()))
 /* GET home page. */
 router.get('/', function(req, res, next) {
