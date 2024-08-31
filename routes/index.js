@@ -5,6 +5,27 @@ const postModel = require("./post");
 const passport = require('passport');
 const localStrategy = require('passport-local')
 const upload = require('./multer')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+mongoose.connect(mongodb+srv://abhigyan:test123@mongoyoutube.zvi76a0.mongodb.net/test?retryWrites=true&w=majority&appName=MongoYoutube)
+
+
+
+
+
 passport.use(new localStrategy(userModel.authenticate()))
 /* GET home page. */
 router.get('/', function(req, res, next) {
