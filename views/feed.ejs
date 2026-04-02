@@ -1,0 +1,91 @@
+<% include ./partials/header.ejs %>
+
+<div class="max-w-[1600px] mx-auto px-4 py-5">
+
+  <!-- Top bar -->
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-3">
+      <% if (query) { %>
+        <p class="text-sm text-[#71717a]">
+          Showing results for <span class="text-white font-semibold">"<%= query %>"</span>
+        </p>
+        <a href="/feed" class="chip">✕ Clear</a>
+      <% } else { %>
+        <p class="text-sm text-[#71717a]">Discover · shuffled fresh</p>
+      <% } %>
+    </div>
+    <% if (user) { %>
+      <a href="/add" class="hidden sm:flex items-center gap-1.5 btn-glow px-4 py-2 rounded-lg text-white text-xs font-semibold">
+        <i class="ri-add-line"></i> Upload pin
+      </a>
+    <% } %>
+  </div>
+
+  <!-- Masonry grid -->
+  <div id="masonry-grid" class="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 gap-3">
+    <% include ./partials/feed_items.ejs %>
+  </div>
+
+  <!-- Infinite scroll sentinel -->
+  <div id="scroll-end" class="h-1 w-full mt-4"></div>
+
+  <!-- Loader -->
+  <div id="loader" class="flex justify-center py-10 opacity-0 transition-opacity duration-300">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Empty state -->
+  <% if (posts.length === 0) { %>
+    <div class="flex flex-col items-center py-32 text-center gap-4">
+      <i class="ri-image-line text-5xl text-[#27272a]"></i>
+      <p class="text-[#52525b] text-sm">No photos found.</p>
+      <a href="/feed" class="chip">Browse all</a>
+    </div>
+  <% } %>
+
+</div>
+
+<script>
+(function() {
+  let page = 1, loading = false, done = false;
+  const grid   = document.getElementById('masonry-grid');
+  const loader = document.getElementById('loader');
+  const sentinel = document.getElementById('scroll-end');
+  const q = new URLSearchParams(location.search).get('q') || '';
+
+  async function fetchMore() {
+    if (loading || done) return;
+    loading = true;
+    loader.style.opacity = '1';
+    page++;
+    try {
+      const r = await fetch(`/feed?page=${page}&q=${encodeURIComponent(q)}&ajax=true`);
+      const html = await r.text();
+      if (!html.trim()) {
+        done = true;
+        sentinel.remove();
+      } else {
+        // Wrap each item in fade-in
+        const tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        [...tmp.children].forEach(el => {
+          el.classList.add('fade-in');
+          grid.appendChild(el);
+        });
+      }
+    } catch(e) { console.error(e); }
+    finally {
+      loading = false;
+      loader.style.opacity = '0';
+    }
+  }
+
+  const io = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting) fetchMore();
+  }, { rootMargin: '400px' });
+
+  if (sentinel) io.observe(sentinel);
+})();
+</script>
+
+<% include ./partials/footer.ejs %>

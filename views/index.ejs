@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>pix — Discover Beautiful Photos</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes fadeUp  { from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)} }
+    @keyframes drift   { 0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)} }
+    @keyframes ticker  { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    .a1{animation:fadeUp .7s .0s ease both}
+    .a2{animation:fadeUp .7s .1s ease both}
+    .a3{animation:fadeUp .7s .2s ease both}
+    .a4{animation:fadeUp .7s .3s ease both}
+    .a5{animation:fadeUp .7s .4s ease both}
+
+    .cell{border-radius:14px;overflow:hidden;position:relative;cursor:pointer}
+    .cell img{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.25,.46,.45,.94),filter .4s}
+    .cell:hover img{transform:scale(1.06);filter:brightness(1.05) saturate(1.1)}
+    .cell .badge{
+      position:absolute;bottom:10px;left:10px;
+      background:rgba(0,0,0,.55);backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:99px;padding:3px 10px;
+      font-size:11px;font-weight:600;color:#fff;
+      opacity:0;transition:opacity .3s;
+    }
+    .cell:hover .badge{opacity:1}
+
+    /* Bento */
+    .bento{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:6px;height:100%}
+    .c-main{grid-row:span 2}
+
+    /* Ticker scroll */
+    .ticker-wrap{overflow:hidden;white-space:nowrap;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+    .ticker-inner{display:inline-flex;animation:ticker 30s linear infinite}
+    .ticker-inner:hover{animation-play-state:paused}
+
+    /* Gradient text */
+    .gtext{background:linear-gradient(135deg,#fff 30%,#a78bfa 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+    /* Feature card */
+    .fcard{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px;transition:border-color .3s,background .3s}
+    .fcard:hover{border-color:rgba(124,58,237,.35);background:rgba(124,58,237,.05)}
+
+    /* Logo mark */
+    .logo-mark{width:32px;height:32px;border-radius:9px;overflow:hidden;background:#7c3aed;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(124,58,237,.4)}
+
+    html{scroll-behavior:smooth}
+    section{scroll-margin-top:20px}
+  </style>
+</head>
+<body class="bg-[#0a0a0f] text-white overflow-x-hidden">
+<div class="mesh-bg"></div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav class="glass-effect sticky top-0 z-50 h-[60px] flex items-center px-6 justify-between">
+  <div class="flex items-center gap-2.5">
+    <div class="logo-mark shrink-0">
+      <img src="/images/logo.png" class="w-full h-full object-cover" alt="pix" onerror="this.style.display='none'">
+    </div>
+    <span class="font-bold text-lg tracking-tight">pix</span>
+  </div>
+  <div class="flex items-center gap-5 text-sm text-[#71717a]">
+    <a href="#features" class="hover:text-white transition-colors hidden sm:block">Features</a>
+    <a href="#categories" class="hover:text-white transition-colors hidden sm:block">Categories</a>
+    <% if (!user) { %>
+      <a href="/login" class="text-white font-semibold hover:text-violet-300 transition-colors">Sign in</a>
+    <% } else { %>
+      <span class="text-white font-semibold">Hi, <%= user.name.split(' ')[0] %></span>
+      <a href="/profile" class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-sm font-bold hover:scale-105 transition-transform">
+        <%= user.name[0].toUpperCase() %>
+      </a>
+    <% } %>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="flex h-[calc(100vh-60px)] min-h-[600px]">
+
+  <!-- Left panel -->
+  <div class="flex flex-col justify-between px-8 lg:px-12 py-10 w-full lg:w-[42%] shrink-0 relative z-10">
+    <div></div><!-- spacer -->
+
+    <div class="max-w-md">
+      <div class="a1 inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-violet-500/20 bg-violet-500/8 text-violet-300 text-xs font-medium">
+        <span class="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></span>
+        120+ curated photos · updated daily
+      </div>
+
+      <h1 class="a2 text-[52px] lg:text-[60px] font-extrabold tracking-[-2.5px] leading-[1.0] mb-5">
+        Find photos<br>
+        <span class="gtext">you actually love</span>
+      </h1>
+
+      <p class="a3 text-[#52525b] text-base leading-relaxed mb-8 max-w-xs" id="tagline">
+        Discover, save, and download stunning photography across 30+ categories.
+      </p>
+
+      <!-- CTA -->
+      <div class="a4 flex flex-col sm:flex-row gap-3">
+        <% if (user) { %>
+          <a href="/feed" class="flex items-center justify-center gap-2 px-7 py-3.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/30">
+            <i class="ri-compass-3-line"></i> Explore now
+          </a>
+          <a href="/logout" class="flex items-center justify-center gap-2 px-7 py-3.5 bg-white/5 hover:bg-white/8 border border-white/8 text-[#a1a1aa] hover:text-white text-sm font-medium rounded-xl transition-all">
+            <i class="ri-logout-box-r-line"></i> Log out
+          </a>
+        <% } else { %>
+          <a href="/feed" class="flex items-center justify-center gap-2 px-7 py-3.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-violet-500/30">
+            <i class="ri-compass-3-line"></i> Explore free
+          </a>
+          <a href="/login" class="flex items-center justify-center gap-2 px-7 py-3.5 bg-white/5 hover:bg-white/8 border border-white/8 text-[#a1a1aa] hover:text-white text-sm font-medium rounded-xl transition-all">
+            <i class="ri-user-line"></i> Sign in to save
+          </a>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="a5 flex items-center gap-6 text-sm">
+      <div>
+        <p class="text-white font-bold text-lg counter" data-target="120">0</p>
+        <p class="text-[#3f3f46] text-xs">Photos</p>
+      </div>
+      <div class="w-px h-7 bg-white/5"></div>
+      <div>
+        <p class="text-white font-bold text-lg counter" data-target="30">0</p>
+        <p class="text-[#3f3f46] text-xs">Categories</p>
+      </div>
+      <div class="w-px h-7 bg-white/5"></div>
+      <div>
+        <p class="text-white font-bold text-lg">4K</p>
+        <p class="text-[#3f3f46] text-xs">Quality</p>
+      </div>
+      <div class="w-px h-7 bg-white/5"></div>
+      <div>
+        <p class="text-white font-bold text-lg">Free</p>
+        <p class="text-[#3f3f46] text-xs">Always</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel: bento photo grid -->
+  <div class="flex-1 relative p-4 hidden lg:block">
+    <div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#0a0a0f] to-transparent z-10 pointer-events-none"></div>
+    <div class="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-[#0a0a0f] to-transparent z-10 pointer-events-none"></div>
+    <div class="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#0a0a0f] to-transparent z-10 pointer-events-none"></div>
+    <% if (randomPosts && randomPosts.length >= 5) { %>
+    <div class="bento h-full">
+      <div class="cell c-main" onclick="location='/feed'">
+        <img src="<%= randomPosts[0].image.startsWith('http') ? randomPosts[0].image.replace(/\/\d+\/\d+$/, '/1920/2560') : '/images/uploads/' + randomPosts[0].image %>" alt="" loading="eager">
+        <div class="badge"><%= randomPosts[0].title %></div>
+      </div>
+      <% for(let i=1;i<=4;i++) { %>
+      <div class="cell" onclick="location='/feed'">
+        <img src="<%= randomPosts[i].image.startsWith('http') ? randomPosts[i].image.replace(/\/\d+\/\d+$/, '/1920/1080') : '/images/uploads/' + randomPosts[i].image %>" alt="" loading="eager">
+        <div class="badge"><%= randomPosts[i].title %></div>
+      </div>
+      <% } %>
+    </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- ══════════════ TICKER ══════════════ -->
+<div class="py-4 border-y border-white/5 bg-white/[0.02]">
+  <div class="ticker-wrap">
+    <div class="ticker-inner">
+      <% const topics=['🚗 Cars','🏙️ Architecture','🌿 Nature','🌌 Space','🤖 Cyberpunk','🎨 Abstract','🦁 Animals','🏔️ Mountains','🌊 Ocean','🌸 Flowers','✈️ Travel','🍕 Food','🌆 City','💡 Technology','👗 Fashion','🌅 Sunset','🏖️ Beach','🌙 Night','❄️ Winter','📷 Photography'];
+         const doubled=[...topics,...topics];
+         doubled.forEach(t=>{ %>
+          <span class="mx-8 text-[#71717a] text-sm font-medium hover:text-white transition-colors cursor-default whitespace-nowrap"><%= t %></span>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ FEATURES ══════════════ -->
+<section id="features" class="max-w-5xl mx-auto px-6 py-20">
+  <div class="text-center mb-12">
+    <p class="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">What you get</p>
+    <h2 class="text-3xl font-bold text-white tracking-tight">Everything you need,<br><span class="gtext">nothing you don't</span></h2>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="fcard">
+      <div class="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center mb-4">
+        <i class="ri-search-line text-violet-400 text-lg"></i>
+      </div>
+      <h3 class="font-semibold text-white mb-1.5">Smart search</h3>
+      <p class="text-sm text-[#52525b] leading-relaxed">Type anything — cars, sunsets, cyberpunk cities — and discover the perfect image instantly.</p>
+    </div>
+    <div class="fcard">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center mb-4">
+        <i class="ri-download-2-line text-emerald-400 text-lg"></i>
+      </div>
+      <h3 class="font-semibold text-white mb-1.5">One-click download</h3>
+      <p class="text-sm text-[#52525b] leading-relaxed">Download any photo to your device in high resolution. No watermarks, no restrictions.</p>
+    </div>
+    <div class="fcard">
+      <div class="w-10 h-10 rounded-xl bg-pink-500/15 flex items-center justify-center mb-4">
+        <i class="ri-bookmark-line text-pink-400 text-lg"></i>
+      </div>
+      <h3 class="font-semibold text-white mb-1.5">Save collections</h3>
+      <p class="text-sm text-[#52525b] leading-relaxed">Create a personal library of your favourite photos. Access them anytime from your dashboard.</p>
+    </div>
+    <div class="fcard">
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/15 flex items-center justify-center mb-4">
+        <i class="ri-infinite-line text-cyan-400 text-lg"></i>
+      </div>
+      <h3 class="font-semibold text-white mb-1.5">Endless scrolling</h3>
+      <p class="text-sm text-[#52525b] leading-relaxed">The feed never runs dry. Infinite scroll loads fresh photos as you go — no page reloads.</p>
+    </div>
+    <div class="fcard">
+      <div class="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center mb-4">
+        <i class="ri-shuffle-line text-amber-400 text-lg"></i>
+      </div>
+      <h3 class="font-semibold text-white mb-1.5">Random every time</h3>
+      <p class="text-sm text-[#52525b] leading-relaxed">Every refresh brings a completely different set of photos. Always something new to discover.</p>
+    </div>
+    <div class="fcard">
+      <div class="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center mb-4">
+        <i class="ri-share-forward-line text-violet-400 text-lg"></i>
+      </div>
+      <h3 class="font-semibold text-white mb-1.5">Share anywhere</h3>
+      <p class="text-sm text-[#52525b] leading-relaxed">Copy a link or share directly to any app. Works on mobile and desktop seamlessly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ CATEGORIES ══════════════ -->
+<section id="categories" class="max-w-5xl mx-auto px-6 pb-20">
+  <div class="text-center mb-10">
+    <p class="text-violet-400 text-xs font-semibold uppercase tracking-widest mb-3">Browse by topic</p>
+    <h2 class="text-3xl font-bold text-white tracking-tight">30+ categories to explore</h2>
+  </div>
+  <div class="flex flex-wrap gap-2.5 justify-center">
+    <% const cats=[
+      {e:'🚗',n:'Cars'},{e:'🏙️',n:'Architecture'},{e:'🌿',n:'Nature'},{e:'🌌',n:'Space'},
+      {e:'🤖',n:'Cyberpunk'},{e:'🎨',n:'Abstract'},{e:'🦁',n:'Animals'},{e:'🏔️',n:'Mountains'},
+      {e:'🌊',n:'Ocean'},{e:'🌸',n:'Flowers'},{e:'✈️',n:'Travel'},{e:'🍕',n:'Food'},
+      {e:'🌆',n:'City'},{e:'💡',n:'Technology'},{e:'👗',n:'Fashion'},{e:'🌅',n:'Sunset'},
+      {e:'🏖️',n:'Beach'},{e:'🌙',n:'Night'},{e:'❄️',n:'Winter'},{e:'🔥',n:'Fire'},
+      {e:'🏛️',n:'Monuments'},{e:'💎',n:'Luxury'},{e:'📷',n:'Photography'},{e:'🎸',n:'Music'},
+    ];
+    cats.forEach(c=>{ %>
+      <a href="/feed?q=<%= c.n.toLowerCase() %>"
+        class="flex items-center gap-2 px-4 py-2 bg-white/4 hover:bg-violet-500/15 border border-white/7 hover:border-violet-500/30 rounded-full text-sm text-[#a1a1aa] hover:text-white transition-all">
+        <span><%= c.e %></span><span><%= c.n %></span>
+      </a>
+    <% }) %>
+  </div>
+</section>
+
+<!-- ══════════════ CTA FOOTER ══════════════ -->
+<section class="max-w-3xl mx-auto px-6 pb-20 text-center">
+  <div class="glass-card rounded-2xl p-12">
+    <h2 class="text-3xl font-bold text-white mb-3 tracking-tight">Start exploring today</h2>
+    <p class="text-[#52525b] mb-8">No account needed. Browse thousands of photos for free, right now.</p>
+    <a href="/feed" class="inline-flex items-center gap-2 px-8 py-4 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-all hover:shadow-xl hover:shadow-violet-500/30 hover:-translate-y-0.5">
+      <i class="ri-compass-3-line"></i> Open the gallery
+    </a>
+  </div>
+</section>
+
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="border-t border-white/5 py-6 text-center">
+  <p class="text-sm text-[#3f3f46]">
+    Made by <span class="text-white font-semibold">Abhigyan</span> ❤️
+  </p>
+</footer>
+
+<script>
+// Rotating taglines
+const lines = [
+  "Discover, save, and download stunning photography across 30+ categories.",
+  "Infinite photos. Zero noise. Start exploring.",
+  "Curate your visual world. Save what you love.",
+  "The cleanest way to discover great photography.",
+];
+const el = document.getElementById('tagline');
+el.style.opacity='0';
+setTimeout(()=>{ el.textContent=lines[Math.floor(Math.random()*lines.length)]; el.style.cssText+='opacity:1;transition:opacity 0.4s'; },80);
+
+// Animated counters
+document.querySelectorAll('.counter').forEach(el => {
+  const target = +el.dataset.target;
+  let count = 0;
+  const step = Math.ceil(target / 40);
+  const t = setInterval(() => {
+    count = Math.min(count + step, target);
+    el.textContent = count + '+';
+    if (count >= target) clearInterval(t);
+  }, 30);
+});
+</script>
+
+</body>
+</html>

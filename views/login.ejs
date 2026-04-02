@@ -1,0 +1,48 @@
+<% include ./partials/header.ejs %>
+<div class="min-h-[calc(100vh-60px)] flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+
+    <div class="text-center mb-8">
+      <div class="w-12 h-12 rounded-2xl overflow-hidden mx-auto mb-4">
+        <img src="/images/logo.png" class="w-full h-full object-cover" alt="pix" onerror="this.parentNode.innerHTML='<div class=\'w-12 h-12 rounded-2xl bg-violet-600 mx-auto flex items-center justify-center mb-4\'><span class=\'text-white font-black text-xl\'>p</span></div>'">
+      </div>
+      <h1 class="text-2xl font-bold text-white">Welcome back to <span class="text-violet-400">pix</span></h1>
+      <p class="text-sm text-[#71717a] mt-1">Sign in to your account</p>
+    </div>
+
+    <form action="/login" method="post" class="flex flex-col gap-3">
+      <div class="relative">
+        <input
+          class="cyber-input w-full px-4 py-3 rounded-xl text-sm pl-10"
+          type="text" name="username" placeholder="Username" required
+        >
+        <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-[#52525b] text-sm"></i>
+      </div>
+      <div class="relative">
+        <input
+          class="cyber-input w-full px-4 py-3 rounded-xl text-sm pl-10"
+          type="password" name="password" placeholder="Password" required
+        >
+        <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-[#52525b] text-sm"></i>
+      </div>
+      <button type="submit" class="btn-glow w-full py-3 text-white text-sm font-semibold rounded-xl mt-1">
+        Sign in
+      </button>
+    </form>
+
+    <div class="mt-6 text-center">
+      <p class="text-sm text-[#71717a]">
+        Don't have an account?
+        <a href="/register" class="text-violet-400 font-semibold hover:text-violet-300 transition-colors">Create one</a>
+      </p>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="/feed" class="text-xs text-[#3f3f46] hover:text-[#71717a] transition-colors">
+        Continue as guest →
+      </a>
+    </div>
+
+  </div>
+</div>
+<% include ./partials/footer.ejs %>

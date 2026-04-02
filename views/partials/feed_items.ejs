@@ -1,0 +1,21 @@
+<% posts.forEach(function(p){ %>
+  <div class="pin-card mb-3" onclick="window.location='/pin/<%= p._id %>'">
+    <img
+      src="<%= p.image && p.image.startsWith('http') ? p.image : '/images/uploads/' + p.image %>"
+      alt="<%= p.title %>"
+      loading="lazy"
+    >
+    <div class="overlay">
+      <p class="text-white text-xs font-semibold line-clamp-2 mb-1.5"><%= p.title %></p>
+      <div class="flex items-center justify-between">
+        <span class="text-[11px] text-white/60">@<%= p.user ? p.user.username : 'curator' %></span>
+        <% if (user) { %>
+          <a href="/save/<%= p._id %>" onclick="event.stopPropagation()"
+            class="px-2.5 py-1 bg-white text-black text-[10px] font-bold rounded-full hover:bg-violet-400 hover:text-white transition-all">
+            <%= user.saved && user.saved.map(String).indexOf(String(p._id)) === -1 ? 'Save' : '✓ Saved' %>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+<% }) %>

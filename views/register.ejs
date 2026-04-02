@@ -1,0 +1,52 @@
+<% include ./partials/header.ejs%>
+  <div class="w-full min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Background Glows -->
+    <div class="absolute w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[140px] -top-40 -right-40 animate-pulse"></div>
+    <div class="absolute w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[140px] -bottom-40 -left-40"></div>
+
+    <div class="w-full max-w-md mx-6 glass-card p-12 rounded-[2.5rem] relative z-10 border border-white/10 shadow-2xl">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-extrabold tracking-tighter text-white mb-2">Initialize <span class="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">Identity</span></h1>
+        <p class="text-zinc-400 text-sm font-medium">Create your unique neural signature.</p>
+      </div>
+
+      <form action="/register" method="post" class="space-y-4">
+        <div class="relative">
+          <i class="ri-user-smile-line absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+          <input class="cyber-input w-full pl-12 pr-4 py-3 rounded-xl text-sm" type="text" name="username" placeholder="Choose Username" required>
+        </div>
+        <div class="relative">
+          <i class="ri-id-card-line absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+          <input class="cyber-input w-full pl-12 pr-4 py-3 rounded-xl text-sm" type="text" name="fullname" placeholder="Full Legal Name" required>
+        </div>
+        <div class="relative">
+          <i class="ri-mail-line absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+          <input class="cyber-input w-full pl-12 pr-4 py-3 rounded-xl text-sm" type="email" name="email" placeholder="Neural Mail (Email)" required>
+        </div>
+        <div class="relative">
+          <i class="ri-lock-password-line absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+          <input class="cyber-input w-full pl-12 pr-4 py-3 rounded-xl text-sm" type="password" name="password" placeholder="Access Cipher (Password)" required>
+        </div>
+        <div class="relative">
+          <i class="ri-phone-line absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"></i>
+          <input class="cyber-input w-full pl-12 pr-4 py-3 rounded-xl text-sm" type="number" name="contact" placeholder="Contact Frequency">
+        </div>
+
+        <button type="submit" class="w-full py-4 btn-glow text-white rounded-xl font-bold uppercase tracking-widest text-xs shadow-lg shadow-violet-500/20 mt-4">
+          Authenticate & Create
+        </button>
+      </form>
+
+      <div class="mt-8 pt-6 border-t border-white/5 text-center">
+        <p class="text-zinc-500 text-xs mb-3">Already have an active identity?</p>
+        <a href="/" class="text-sm font-bold text-violet-400 hover:text-violet-300 transition-colors">
+          Re-connect here
+        </a>
+      </div>
+
+      <p class="text-[9px] text-zinc-600 mt-8 text-center leading-relaxed px-4">
+        By initializing, you consent to the Neural-Link Agreement and PinNova's Encryption Standards.
+      </p>
+    </div>
+  </div>
+<% include ./partials/footer.ejs%>

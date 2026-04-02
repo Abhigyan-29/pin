@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Environment Variables
+.env
+
+# Vercel Configuration
+.vercel/
+
+# Temporary and Build Files
+tmp/
+bin/node_modules/
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# VS Code and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo

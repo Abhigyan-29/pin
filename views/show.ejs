@@ -1,0 +1,56 @@
+<% include ./partials/header.ejs%>
+
+<div class="w-full min-h-screen pt-4 px-6 pb-12">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center gap-4 justify-between bg-white/5 p-6 rounded-[2rem] glass-effect border border-white/5">
+        <div>
+            <h2 class="text-2xl font-extrabold text-white tracking-tighter">Personal <span class="text-cyan-400">Archive</span></h2>
+            <p class="text-zinc-500 text-sm font-medium">Your synchronized data transmissions.</p>
+        </div>
+        <a href="/add" class="px-6 py-2.5 btn-glow text-white rounded-full text-xs font-bold shadow-lg shadow-violet-500/20 flex items-center gap-2 w-fit">
+            <i class="ri-add-line"></i> New Signal
+        </a>
+    </div>
+
+    <% if (user.posts.length > 0) { %>
+    <div class="columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-6 space-y-6">
+        <% user.posts.forEach(function(elem){ %>
+            <div class="break-inside-avoid glass-card rounded-2xl overflow-hidden group relative border border-white/5 hover:border-cyan-400/30 transition-all">
+                <div class="aspect-auto overflow-hidden">
+                    <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                         src="<%= elem.image.startsWith('http') ? elem.image : '/images/uploads/' + elem.image %>" 
+                         alt="<%= elem.title %>">
+                </div>
+                
+                <div class="p-4 bg-gradient-to-t from-black/80 to-transparent">
+                    <h5 class="text-white font-bold text-sm tracking-tight mb-1"><%= elem.title %></h5>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Signal Locked</span>
+                        <div class="flex gap-2">
+                            <button class="w-7 h-7 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+                                <i class="ri-eye-line text-xs text-zinc-400"></i>
+                            </button>
+                            <a href="/delete/<%= elem._id %>" class="w-7 h-7 rounded-full bg-white/5 hover:bg-red-500/20 flex items-center justify-center group/del transition-colors">
+                                <i class="ri-delete-bin-line text-xs text-zinc-400 group-hover/del:text-red-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hover Pulse Effect -->
+                <div class="absolute inset-0 border-2 border-cyan-400/0 group-hover:border-cyan-400/20 rounded-2xl pointer-events-none transition-all duration-300"></div>
+            </div>
+        <% }) %>  
+    </div>
+    <% } else { %>
+        <div class="w-full py-40 flex flex-col items-center justify-center text-center">
+            <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/5 animate-pulse">
+                <i class="ri-radar-line text-4xl text-zinc-700"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">No Archived Signals</h3>
+            <p class="text-zinc-500 max-w-xs mx-auto text-sm">Your personal archive is awaiting its first transmission. Start building your future today.</p>
+            <a href="/add" class="mt-8 px-10 py-3 btn-glow text-white rounded-xl font-bold text-sm">Initialize Data</a>
+        </div>
+    <% } %>
+</div>
+
+<% include ./partials/footer.ejs%>
