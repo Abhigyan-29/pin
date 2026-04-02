@@ -13,13 +13,25 @@ passport.use(new localStrategy(userModel.authenticate()))
 /* GET splash/home page. */
 router.get('/', async function(req, res, next) {
   let user = null;
+
   if (req.isAuthenticated()) {
     user = await userModel.findOne({ username: req.session.passport.user });
   }
-  // Grab random posts for the background collage
+
+  // Get random posts from DB
   const totalPosts = await postModel.countDocuments();
   const skip = Math.max(0, Math.floor(Math.random() * Math.max(1, totalPosts - 12)));
-  const randomPosts = await postModel.find().skip(skip).limit(12);
+
+  let randomPosts = await postModel.find().skip(skip).limit(12);
+
+  // 🔥 Fallback if DB empty
+  if (!randomPosts || randomPosts.length === 0) {
+    randomPosts = Array.from({ length: 6 }).map((_, i) => ({
+      image: `https://picsum.photos/seed/home-${i}/400/600`,
+      title: "Sample"
+    }));
+  }
+
   res.render('index', { nav: false, user, randomPosts });
 });
 
