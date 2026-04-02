@@ -117,7 +117,7 @@ try {
   posts = [];
 }
 
- let posts;
+
 
 try {
   if (query) {
