@@ -110,19 +110,32 @@ router.get('/feed', async function(req, res, next) {
     }
   }
 
-  let posts;
+ let posts;
+
+try {
   if (query) {
     posts = await postModel.find({
       title: { $regex: query, $options: 'i' }
     }).populate("user").skip(skip).limit(limit).sort({_id: -1});
   } else {
-    // Use aggregate to get truly random posts (shuffles on each page load)
     posts = await postModel.aggregate([
       { $sample: { size: limit } }
     ]);
-    // Populate the user field manually since aggregate doesn't support .populate()
     posts = await postModel.populate(posts, { path: 'user' });
   }
+} catch (err) {
+  posts = [];
+}
+
+// 🔥 fallback if empty
+if (!posts || posts.length === 0) {
+  posts = Array.from({ length: 12 }).map((_, i) => ({
+    title: "Sample",
+    description: "Dynamic image",
+    image: `https://picsum.photos/seed/feed-${Date.now()}-${i}/400/600`,
+    user: { name: "Guest" }
+  }));
+}
 
   // If this is an infinite scroll request, just send back the HTML snippet
   if (req.query.ajax === 'true') {
