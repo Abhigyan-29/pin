@@ -87,28 +87,35 @@ router.get('/feed', async function(req, res, next) {
   const skip = (page - 1) * limit;
 
   // Dynamic Content Generation for Searches
+let posts;
+
+try {
   if (query) {
-    const count = await postModel.countDocuments({ title: { $regex: query, $options: 'i' } });
-    if (count < 10) {
-      let dummyUser = await userModel.findOne({ username: 'system_bot' });
-      if (dummyUser) {
-        const fakePosts = [];
-        const heights = [400,500,600,450,550,700,480,520,580,620,420,540,660,490,510,630,470,560];
-        for (let i = 0; i < 18; i++) {
-          const seed = `${query}-${Date.now()}-${Math.random()}`;
-          fakePosts.push({
-            user: dummyUser._id,
-            title: query.charAt(0).toUpperCase() + query.slice(1),
-            description: `A curated photo for the "${query}" category.`,
-            image: `https://picsum.photos/seed/${encodeURIComponent(seed)}/400/${heights[i]}`
-          });
-        }
-        const inserted = await postModel.insertMany(fakePosts);
-        dummyUser.posts.push(...inserted.map(p => p._id));
-        await dummyUser.save();
-      }
+    posts = await postModel.find({
+      title: { $regex: query, $options: 'i' }
+    }).skip(skip).limit(limit);
+
+    // 🔥 fallback for search
+    if (!posts || posts.length === 0) {
+      posts = Array.from({ length: 12 }).map((_, i) => ({
+        title: query,
+        description: "Dynamic search result",
+        image: `https://picsum.photos/seed/${encodeURIComponent(query)}-${page}-${i}/400/600`,
+        user: { name: "Guest" }
+      }));
     }
+
+  } else {
+    posts = await postModel.aggregate([
+      { $sample: { size: limit } }
+    ]);
+    posts = await postModel.populate(posts, { path: 'user' });
   }
+
+} catch (err) {
+  console.log(err);
+  posts = [];
+}
 
  let posts;
 
@@ -132,7 +139,7 @@ if (!posts || posts.length === 0) {
   posts = Array.from({ length: 12 }).map((_, i) => ({
     title: "Sample",
     description: "Dynamic image",
-    image: `https://picsum.photos/seed/feed-${Date.now()}-${i}/400/600`,
+   image: `https://picsum.photos/seed/feed-${page}-${i}/400/600`,
     user: { name: "Guest" }
   }));
 }
@@ -192,7 +199,14 @@ router.get('/pin/:postid', async function(req, res, next) {
     user = await userModel.findOne({username : req.session.passport.user});
   }
   const post = await postModel.findById(req.params.postid).populate("user");
-  if (!post) return res.redirect('/feed');
+  if (!post) {
+  post = {
+    title: "Sample",
+    description: "Dynamic preview",
+    image: `https://picsum.photos/seed/${req.params.postid}/800/1000`,
+    user: { name: "Guest" }
+  };
+}
   
   res.render("pin", { user, post, nav: false });
 });
