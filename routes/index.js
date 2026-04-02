@@ -198,7 +198,34 @@ router.get('/pin/:postid', async function(req, res, next) {
   if(req.isAuthenticated()) {
     user = await userModel.findOne({username : req.session.passport.user});
   }
-  const post = await postModel.findById(req.params.postid).populate("user");
+ const mongoose = require("mongoose");
+
+router.get('/pin/:postid', async function(req, res, next) {
+  let user = null;
+
+  if (req.isAuthenticated()) {
+    user = await userModel.findOne({ username: req.session.passport.user });
+  }
+
+  let post = null;
+
+  // 🔥 Check if valid Mongo ID
+  if (mongoose.Types.ObjectId.isValid(req.params.postid)) {
+    post = await postModel.findById(req.params.postid).populate("user");
+  }
+
+  // 🔥 Fallback for dynamic images
+  if (!post) {
+    post = {
+      title: "Sample",
+      description: "Dynamic preview",
+      image: `https://picsum.photos/seed/${req.params.postid}/800/1000`,
+      user: { username: "Guest" }
+    };
+  }
+
+  res.render("pin", { user, post, nav: false });
+});
   if (!post) {
   post = {
     title: "Sample",
