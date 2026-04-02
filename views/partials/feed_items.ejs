@@ -1,5 +1,5 @@
 <% posts.forEach(function(p){ %>
-  <div class="pin-card mb-3" onclick="window.location='/pin/<%= p._id %>'">
+  <div class="pin-card mb-3" onclick="window.location='/pin/<%= p._id ? p._id : ('temp-' + Math.random()) %>'">
     <img
       src="<%= p.image && p.image.startsWith('http') ? p.image : '/images/uploads/' + p.image %>"
       alt="<%= p.title %>"
