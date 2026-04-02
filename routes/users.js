@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const plm = require("passport-local-mongoose");
 
 // Use cloud URI if available, fallback to localhost for development
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/pin";
-mongoose.connect(MONGODB_URI);
 
 const userSchema = mongoose.Schema({
 username : String,
