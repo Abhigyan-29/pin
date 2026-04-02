@@ -83,7 +83,7 @@ router.get('/feed', async function(req, res, next) {
         const fakePosts = [];
         const heights = [400,500,600,450,550,700,480,520,580,620,420,540,660,490,510,630,470,560];
         for (let i = 0; i < 18; i++) {
-          const seed = `${query.replace(/\s+/g, '-').toLowerCase()}-${i}`;
+          const seed = `${query}-${Date.now()}-${Math.random()}`;
           fakePosts.push({
             user: dummyUser._id,
             title: query.charAt(0).toUpperCase() + query.slice(1),
@@ -181,23 +181,9 @@ router.get('/download/:postid', async function(req, res, next) {
     // Set a dynamic filename
     const filename = `PinNova_${post.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'artifact'}.jpg`;
     
-    // Remote image handling via proxy (with redirect following)
-    if (imgUrl.startsWith('http')) {
-      const { Readable } = require('stream');
-      const fetchResponse = await fetch(imgUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
-      });
-      
-      if (!fetchResponse.ok) {
-        console.error("Fetch failed with status:", fetchResponse.status, fetchResponse.statusText);
-        return res.status(404).send('External image failed to load');
-      }
-      
-      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-      res.setHeader('Content-Type', fetchResponse.headers.get('content-type') || 'image/jpeg');
-      
-      Readable.fromWeb(fetchResponse.body).pipe(res);
-    } 
+   if (imgUrl.startsWith('http')) {
+  return res.redirect(imgUrl); // ✅ safe fix
+}
     // Local image handling
     else {
       const filePath = path.join(__dirname, '../public/images/uploads/', imgUrl);
